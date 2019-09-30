@@ -1,6 +1,7 @@
 const $app = document.getElementById('app');
 const $observe = document.getElementById('observe');
 const API = 'https://rickandmortyapi.com/api/character/';
+window.localStorage.clear();
 
 const getData = api => {
   fetch(api)
@@ -25,11 +26,26 @@ const getData = api => {
     .catch(error => console.log(error));
 }
 
+const noMoreData = function () {
+  const noDataItem = document.createElement('p');
+  noDataItem.classList.add('No-Data');
+  noDataItem.innerText = `Ya no hay más personajes...`;
+  $app.appendChild(noDataItem);
+};
+
 const loadData = async () => {
-  if (localStorage.getItem('next_fetch')) {
-    await getData(localStorage.getItem('next_fetch'))
-  } else {
-    getData(API);
+  try {
+    if (localStorage.getItem('next_fetch')) {
+      await getData(localStorage.getItem('next_fetch'))
+    } else if (localStorage.getItem('next_fetch') === "") {
+      noMoreData();
+      intersectionObserver.unobserve($observe);
+    } else {
+      getData(API);
+    }
+  }
+  catch (error) {
+    console.log(`Ha ocurrido un error: ${error}`)
   }
 }
 
