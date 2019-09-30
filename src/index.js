@@ -7,6 +7,8 @@ const getData = api => {
     .then(response => response.json())
     .then(response => {
       const characters = response.results;
+      const next = response.info.next;
+      localStorage.setItem('next_fetch', next);
       let output = characters.map(character => {
         return `
       <article class="Card">
@@ -23,8 +25,12 @@ const getData = api => {
     .catch(error => console.log(error));
 }
 
-const loadData = () => {
-  getData(API);
+const loadData = async () => {
+  if (localStorage.getItem('next_fetch')) {
+    await getData(localStorage.getItem('next_fetch'))
+  } else {
+    getData(API);
+  }
 }
 
 const intersectionObserver = new IntersectionObserver(entries => {
